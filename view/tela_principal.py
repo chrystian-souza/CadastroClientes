@@ -91,6 +91,7 @@ class MainWindow (QMainWindow):
         self.btn_limpar.clicked.connect(self.limpar_conteudo)
         self.txt_cpf.editingFinished.connect(self.consulta_cliente)
         self.btn_remover.clicked.connect(self.remover_cliente)
+        self.btn_limpar.clicked.connect(self.limpar_campos)
 
 
     def salvar_cliente(self):
@@ -111,51 +112,63 @@ class MainWindow (QMainWindow):
             municipio=self.txt_municipio.text(),
             estado=self.txt_estado.text()
         )
-        retorno = db.registrar_cliente(cliente)
+        if self.btn_salvar.text() == 'Salvar':
+            retorno = db.registrar_cliente(cliente)
 
 
-        if retorno == 'ok':
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowTitle('Cadastro Realizado ')
-            msg.setText('Cadastro realizado com sucesso')
-            msg.exec()
+            if retorno == 'ok':
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setWindowTitle('Cadastro Realizado ')
+                msg.setText('Cadastro realizado com sucesso')
+                msg.exec()
 
-        elif retorno == 'UNIQUE constraint failed: CLIENTE.CPF':
+            elif retorno == 'UNIQUE constraint failed: CLIENTE.CPF':
 
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle('Erro ao cadastrar')
-            msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
-            msg.exec()
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle('Erro ao cadastrar')
+                msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
+                msg.exec()
 
-        else:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle('Erro ao cadastrar ')
-            msg.setText('Erro ao cadastrar verfique os dados inseridos')
-            msg.exec()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle('Erro ao cadastrar ')
+                msg.setText('Erro ao cadastrar verfique os dados inseridos')
+                msg.exec()
+        elif self.btn_salvar.text() == 'Atualizar':
+
+            retorno = db.atualizar_cliente(cliente)
+
+            if retorno == 'ok':
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setWindowTitle('Cadratro atualizado')
+                msg.setText('Cadastro atualizado com sucesso')
+                msg.exec()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setWindowTitle('Erro ao atualizar')
+                msg.setText('Erro ao cadastrar, verifique os dados inseridos')
+                msg.exec()
 
     def limpar_conteudo(self):
-        self.txt_cpf.setText('')
-        self.txt_nome.setText('')
-        self.txt_telefone_fixo.setText('')
-        self.txt_telefone_celular.setText('')
-        self.cb_sexo.setCurrentIndex(0)
-        self.txt_cep.setText('')
-        self.txt_logradouro.setText('')
-        self.txt_numero.setText('')
-        self.txt_bairro.setText('')
-        self.txt_municipio.setText('')
-        self.txt_complemento.setText('')
-        self.txt_estado.setText('')
+        for widget in self.container.children():
+            if isinstance(widget, QLineEdit):
+                widget.clear()
+            elif isinstance(widget, QMessageBox):
+                widget.setCurrentIndex(0)
+        self.btn_remover.setVisible(False)
+        self.btn_salvar.setText('Salvar')
 
     def consulta_cliente(self):
         db = DataBase()
         retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.','').replace('-',''))
 
         if retorno is not None:
-            self.btn_salvar.setText('Atulizar')
+            self.btn_salvar.setText('Atualizar')
             msg = QMessageBox()
             msg.setWindowTitle('Cliente já cadastrado')
             msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
@@ -204,5 +217,30 @@ class MainWindow (QMainWindow):
                 nv_msg.exec()
 
     def limpar_campos(self):
-        pass
+        teste = self.container.children()
+        for widget in self.container.children():
+            if isinstance(widget, QLineEdit):
+                widget.clear()
+            elif isinstance(widget, QComboBox):
+                widget.setCurrentIndex(0)
+        self.btn_remover.setVisible(False)
+        self.btn_salvar.setText('Salvar')
+
+    def consulta_endereco(self):
+        url = f'https://viacep.com.br/ws{str(self.txt_cpf.text()).replace(".", "").replace("-", "")}/json/'
+        response = requests.get(url)
+        endereco = json.loads(response.text)
+
+        if response.status_code == 200 and 'erro' not in endereco:
+            self.txt_logradouro.setText(endereco['logradouro'])
+            self.txt_bairro.setText(endereco['bairro'])
+            self.txt_municipio.setText(endereco['localidade'])
+            self.txt_estado.setText((endereco['uf']))
+
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle('Consultar CEP')
+            msg.setText('Erro ao consultar CEP verifique os dados inseridos')
+            msg.exec()
 
