@@ -91,7 +91,7 @@ class MainWindow (QMainWindow):
         self.btn_limpar.clicked.connect(self.limpar_conteudo)
         self.txt_cpf.editingFinished.connect(self.consulta_cliente)
         self.btn_remover.clicked.connect(self.remover_cliente)
-        self.btn_limpar.clicked.connect(self.limpar_campos)
+        self.txt_cep.editingFinished.connect(self.consulta_endereco)
 
 
     def salvar_cliente(self):
@@ -144,7 +144,7 @@ class MainWindow (QMainWindow):
             if retorno == 'ok':
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
-                msg.setWindowTitle('Cadratro atualizado')
+                msg.setWindowTitle('Cadastro atualizado')
                 msg.setText('Cadastro atualizado com sucesso')
                 msg.exec()
             else:
@@ -217,7 +217,6 @@ class MainWindow (QMainWindow):
                 nv_msg.exec()
 
     def limpar_campos(self):
-        teste = self.container.children()
         for widget in self.container.children():
             if isinstance(widget, QLineEdit):
                 widget.clear()
