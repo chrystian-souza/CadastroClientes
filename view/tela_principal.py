@@ -1,7 +1,7 @@
 import requests
 import json
 from PySide6.QtWidgets import (QMainWindow, QLabel, QComboBox, QLineEdit, QPushButton, QWidget, QMessageBox,
-                               QSizePolicy, QVBoxLayout, QTableWidget)
+                               QSizePolicy, QVBoxLayout, QTableWidget, QAbstractItemView, QTableWidgetItem)
 
 from model.cliente import Cliente
 from controller.cliente_dao import DataBase
@@ -55,6 +55,8 @@ class MainWindow (QMainWindow):
                                                        'SEXO', 'Cep', 'Logradouro', 'Número', 'Complemento',
                                                        'Bairro', 'Município', 'Estado'])
 
+        self.tabela_clientes.setSelectionMode(QAbstractItemView.NoSelection)
+        self.tabela_clientes.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         layout = QVBoxLayout()
         layout.addWidget(self.lbl_cpf)
@@ -94,10 +96,12 @@ class MainWindow (QMainWindow):
 
         self.btn_remover.setVisible(False)
         self.btn_salvar.clicked.connect(self.salvar_cliente)
+        self.txt_cep.editingFinished.connect(self.consulta_endereco)
         self.btn_limpar.clicked.connect(self.limpar_conteudo)
         self.txt_cpf.editingFinished.connect(self.consulta_cliente)
         self.btn_remover.clicked.connect(self.remover_cliente)
-        self.txt_cep.editingFinished.connect(self.consulta_endereco)
+        self.tabela_clientes.cellDoubleClicked.connect(self.carrega_dados)
+        self.popula_tabela_clientes()
 
 
     def salvar_cliente(self):
@@ -232,7 +236,7 @@ class MainWindow (QMainWindow):
         self.btn_salvar.setText('Salvar')
 
     def consulta_endereco(self):
-        url = f'https://viacep.com.br/ws{str(self.txt_cpf.text()).replace(".", "").replace("-", "")}/json/'
+        url = f'https://viacep.com.br/ws/{str(self.txt_cep.text()).replace(".", "").replace("-", "")}/json/'
         response = requests.get(url)
         endereco = json.loads(response.text)
 
@@ -248,4 +252,30 @@ class MainWindow (QMainWindow):
             msg.setWindowTitle('Consultar CEP')
             msg.setText('Erro ao consultar CEP verifique os dados inseridos')
             msg.exec()
+
+
+    def popula_tabela_clientes(self):
+        self.tabela_clientes.setRowCount(0)
+        db = DataBase()
+        lista_clientes = db.consultar_todos_clientes()
+        self.tabela_clientes.setRowCount(len(lista_clientes))
+
+        for linha, cliente in enumerate(lista_clientes):
+            for coluna, valor in enumerate(linha):
+                self.tabela_clientes.setItem(linha, coluna, QTableWidgetItem(str(valor)))
+
+    def carrega_dados(self, row, column):
+        self.txt_cpf.setText(self.tabela_clientes.item(row, 0).text())
+        self.txt_nome.setText(self.tabela_clientes.item(row, 1).text())
+        self.txt_telefone_fixo.setText(self.tabela_clientes.item(row, 2).text())
+        self.txt_telefone_celular.setText(self.tabela_clientes.item(row, 3).text())
+        self.txt_cep.setText(self.tabela_clientes.item(row, 4).text())
+        self.txt_logradouro.setText(self.tabela_clientes.item(row, 5).text())
+        self.txt_numero.setText(self.tabela_clientes.item(row, 6).text())
+        self.txt_complemento.setText(self.tabela_clientes.item(row, 7).text())
+        self.txt_bairro.setText(self.tabela_clientes.item(row, 8).text())
+        self.txt_municipio.setText(self.tabela_clientes.item(row, 9).text())
+        self.txt_uf.setText(self.tabela_clientes.item(row, 10).text())
+        self.btn_salvar.setText('Atualizar')
+        self.txt_cpf.setReadOnly(True)
 
