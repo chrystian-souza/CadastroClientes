@@ -277,5 +277,5 @@ class MainWindow (QMainWindow):
         self.txt_municipio.setText(self.tabela_clientes.item(row, 9).text())
         self.txt_uf.setText(self.tabela_clientes.item(row, 10).text())
         self.btn_salvar.setText('Atualizar')
-        self.txt_cpf.setReadOnly(True)
+        self.txt_cpf.setReadOnly(True)hhh
 
