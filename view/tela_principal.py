@@ -163,6 +163,8 @@ class MainWindow (QMainWindow):
                 msg.setWindowTitle('Erro ao atualizar')
                 msg.setText('Erro ao cadastrar, verifique os dados inseridos')
                 msg.exec()
+            self.popula_tabela_clientes()
+            self.txt_cpf.setReadOnly(False)
 
     def limpar_conteudo(self):
         for widget in self.container.children():
@@ -269,6 +271,8 @@ class MainWindow (QMainWindow):
         self.txt_nome.setText(self.tabela_clientes.item(row, 1).text())
         self.txt_telefone_fixo.setText(self.tabela_clientes.item(row, 2).text())
         self.txt_telefone_celular.setText(self.tabela_clientes.item(row, 3).text())
+        sexo_map = {'Não informardo': 0, 'Masculino': 1, 'Feminino': 2}
+        self.cb_sexo.setCurrentIndex(sexo_map.get(self.tabela_clientes.item(row, 4).text(), 0))
         self.txt_cep.setText(self.tabela_clientes.item(row, 4).text())
         self.txt_logradouro.setText(self.tabela_clientes.item(row, 5).text())
         self.txt_numero.setText(self.tabela_clientes.item(row, 6).text())
@@ -277,5 +281,5 @@ class MainWindow (QMainWindow):
         self.txt_municipio.setText(self.tabela_clientes.item(row, 9).text())
         self.txt_uf.setText(self.tabela_clientes.item(row, 10).text())
         self.btn_salvar.setText('Atualizar')
-        self.txt_cpf.setReadOnly(True)hhh
+        self.txt_cpf.setReadOnly(True)
 
