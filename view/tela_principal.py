@@ -1,7 +1,7 @@
 import requests
 import json
 from PySide6.QtWidgets import (QMainWindow, QLabel, QComboBox, QLineEdit, QPushButton, QWidget, QMessageBox,
-                               QSizePolicy, QVBoxLayout)
+                               QSizePolicy, QVBoxLayout, QTableWidget)
 
 from model.cliente import Cliente
 from controller.cliente_dao import DataBase
@@ -11,7 +11,7 @@ class MainWindow (QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setMinimumSize(400, 300)
+        self.setMinimumSize(500, 900)
 
 
         self.setWindowTitle('Cadastro de cliente')
@@ -48,6 +48,12 @@ class MainWindow (QMainWindow):
         self.btn_salvar = QPushButton('Salvar')
         self.btn_limpar = QPushButton('Limpar')
         self.btn_remover = QPushButton('Remover')
+        self.tabela_clientes = QTableWidget()
+
+        self.tabela_clientes.setColumnCount(12)
+        self.tabela_clientes.setHorizontalHeaderLabels(['CPF', 'Nome', 'Telefone Fixo', 'Telefone Celular',
+                                                       'SEXO', 'Cep', 'Logradouro', 'Número', 'Complemento',
+                                                       'Bairro', 'Município', 'Estado'])
 
 
         layout = QVBoxLayout()
@@ -75,7 +81,7 @@ class MainWindow (QMainWindow):
         layout.addWidget(self.txt_municipio)
         layout.addWidget(self.lbl_estado)
         layout.addWidget(self.txt_estado)
-
+        layout.addWidget(self.tabela_clientes)
         layout.addWidget(self.btn_salvar)
         layout.addWidget(self.btn_limpar)
         layout.addWidget(self.btn_remover)

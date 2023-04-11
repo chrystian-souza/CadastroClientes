@@ -68,7 +68,20 @@ class DataBase:
             cursor.execute(f""" SELECT * FROM CLIENTE WHERE CPF = '{str(cpf).replace('.', '').replace('-', '')}'""")
             return cursor.fetchone()
         except sqlite3.Error as e:
-            return e
+            return None
+        finally:
+            self.close_connection()
+
+    def consultar_todos_clientes(self):
+        self.connect()
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM CLIENTE")
+            clientes = cursor.fetchall()
+            return clientes
+        except sqlite3.Error as e:
+            print(f'Erro {e}')
+            return None
         finally:
             self.close_connection()
 
@@ -107,3 +120,5 @@ class DataBase:
             return e
         finally:
             self.close_connection()
+
+
