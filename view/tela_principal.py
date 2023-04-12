@@ -227,6 +227,8 @@ class MainWindow (QMainWindow):
                 nv_msg.setWindowTitle('Remover cliente')
                 nv_msg.setText('Erro ao Remover')
                 nv_msg.exec()
+            self.txt_cpf.setReadOnly(False)
+            self.popula_tabela_clientes()
 
     def limpar_campos(self):
         for widget in self.container.children():
@@ -236,6 +238,7 @@ class MainWindow (QMainWindow):
                 widget.setCurrentIndex(0)
         self.btn_remover.setVisible(False)
         self.btn_salvar.setText('Salvar')
+        self.txt_cpf.setReadOnly(False)
 
     def consulta_endereco(self):
         url = f'https://viacep.com.br/ws/{str(self.txt_cep.text()).replace(".", "").replace("-", "")}/json/'
@@ -263,7 +266,7 @@ class MainWindow (QMainWindow):
         self.tabela_clientes.setRowCount(len(lista_clientes))
 
         for linha, cliente in enumerate(lista_clientes):
-            for coluna, valor in enumerate(linha):
+            for coluna, valor in enumerate(cliente):
                 self.tabela_clientes.setItem(linha, coluna, QTableWidgetItem(str(valor)))
 
     def carrega_dados(self, row, column):
@@ -279,7 +282,7 @@ class MainWindow (QMainWindow):
         self.txt_complemento.setText(self.tabela_clientes.item(row, 7).text())
         self.txt_bairro.setText(self.tabela_clientes.item(row, 8).text())
         self.txt_municipio.setText(self.tabela_clientes.item(row, 9).text())
-        self.txt_uf.setText(self.tabela_clientes.item(row, 10).text())
+        self.txt_estado.setText(self.tabela_clientes.item(row, 10).text())
         self.btn_salvar.setText('Atualizar')
         self.txt_cpf.setReadOnly(True)
 
