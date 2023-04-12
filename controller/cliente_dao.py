@@ -102,17 +102,17 @@ class DataBase:
         try:
             cursor = self.connection.cursor()
             cursor.execute(f"""UPDATE CLIENTE SET
-                           NOME = {cliente.nome}', 
+                           NOME = '{cliente.nome}', 
                            TELEFONE_FIXO = '{cliente.telefone_fixo}', 
                            TELEFONE_CELULAR = '{cliente.telefone_celular}', 
                            SEXO ='{cliente.sexo}', 
-                           CEP'{cliente.cep}', 
+                           CEP = '{cliente.cep}', 
                            LOGRADOURO = '{cliente.logradouro}', 
                            NUMERO = '{cliente.numero}', 
                            COMPLEMENTO = '{cliente.complemento}', 
                            BAIRRO = '{cliente.bairro}', 
                            MUNICIPIO = '{cliente.municipio}', 
-                           ESTADO = '{cliente.estado}
+                           ESTADO = '{cliente.estado}'
                            WHERE CPF = '{str(cliente.cpf).replace('.', '').replace('-', '')}'""")
             self.connection.commit()
             return 'ok'
