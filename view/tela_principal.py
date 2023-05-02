@@ -109,12 +109,12 @@ class MainWindow (QMainWindow):
 
 
         cliente = Cliente(
-            cpf = self.txt_cpf.text(),
-            nome = self.txt_nome.text(),
-            telefone_fixo = self.txt_telefone_fixo.text(),
-            telefone_celular = self.txt_telefone_celular.text(),
-            sexo = self.cb_sexo.currentText(),
-            cep = self.txt_cep.text(),
+            cpf=self.txt_cpf.text(),
+            nome=self.txt_nome.text(),
+            telefone_fixo=self.txt_telefone_fixo.text(),
+            telefone_celular=self.txt_telefone_celular.text(),
+            sexo=self.cb_sexo.currentText(),
+            cep=self.txt_cep.text(),
             logradouro=self.txt_logradouro.text(),
             numero=self.txt_numero.text(),
             complemento=self.txt_complemento.text(),
