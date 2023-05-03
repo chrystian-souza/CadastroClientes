@@ -3,8 +3,8 @@ import json
 from PySide6.QtWidgets import (QMainWindow, QLabel, QComboBox, QLineEdit, QPushButton, QWidget, QMessageBox,
                                QSizePolicy, QVBoxLayout, QTableWidget, QAbstractItemView, QTableWidgetItem)
 
-from model.cliente import Cliente
-from controller.cliente_dao import DataBase
+from infra.entities.cliente import Cliente
+from infra.configs.connection import DBConnectionHandler
 
 
 class MainWindow(QMainWindow):
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
         self.popula_tabela_clientes()
 
     def salvar_cliente(self):
-        db = DataBase()
+        db = DBConnectionHandler()
 
         cliente = Cliente(
             cpf=self.txt_cpf.text(),
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
         self.btn_salvar.setText('Salvar')
 
     def consulta_cliente(self):
-        db = DataBase()
+        db = DBConnectionHandler()
         retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.', '').replace('-', ''))
 
         if retorno is not None:
@@ -207,7 +207,7 @@ class MainWindow(QMainWindow):
         resposta = msg.exec()
 
         if resposta == QMessageBox.Yes:
-            db = DataBase()
+            db = DBConnectionHandler()
             retorno = db.deletar_cliente(self.txt_cpf.text())
 
             if retorno == 'ok':
@@ -253,7 +253,7 @@ class MainWindow(QMainWindow):
 
     def popula_tabela_clientes(self):
         self.tabela_clientes.setRowCount(0)
-        db = DataBase()
+        db = DBConnectionHandler()
         lista_clientes = db.consultar_todos_clientes()
         self.tabela_clientes.setRowCount(len(lista_clientes))
 
