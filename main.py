@@ -2,10 +2,10 @@ import sys
 
 
 from PySide6.QtWidgets import QApplication
-from controller.cliente_dao import DataBase
+from infra.configs.connection import DBConnectionHandler
 from view.tela_principal import MainWindow
 
-db = DataBase()
+db = DBConnectionHandler()
 db.connect()
 db.create_table_cliente()
 db.close_connection()

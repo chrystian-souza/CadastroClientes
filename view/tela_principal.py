@@ -7,15 +7,13 @@ from model.cliente import Cliente
 from controller.cliente_dao import DataBase
 
 
-class MainWindow (QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setMinimumSize(500, 900)
 
-
         self.setWindowTitle('Cadastro de cliente')
-
 
         self.lbl_cpf = QLabel('CPF')
         self.txt_cpf = QLineEdit()
@@ -52,8 +50,8 @@ class MainWindow (QMainWindow):
 
         self.tabela_clientes.setColumnCount(12)
         self.tabela_clientes.setHorizontalHeaderLabels(['CPF', 'Nome', 'Telefone Fixo', 'Telefone Celular',
-                                                       'SEXO', 'Cep', 'Logradouro', 'Número', 'Complemento',
-                                                       'Bairro', 'Município', 'Estado'])
+                                                        'SEXO', 'Cep', 'Logradouro', 'Número', 'Complemento',
+                                                        'Bairro', 'Município', 'Estado'])
 
         self.tabela_clientes.setSelectionMode(QAbstractItemView.NoSelection)
         self.tabela_clientes.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -93,7 +91,6 @@ class MainWindow (QMainWindow):
         self.setCentralWidget(self.container)
         self.container.setLayout(layout)
 
-
         self.btn_remover.setVisible(False)
         self.btn_salvar.clicked.connect(self.salvar_cliente)
         self.txt_cep.editingFinished.connect(self.consulta_endereco)
@@ -103,10 +100,8 @@ class MainWindow (QMainWindow):
         self.tabela_clientes.cellDoubleClicked.connect(self.carrega_dados)
         self.popula_tabela_clientes()
 
-
     def salvar_cliente(self):
         db = DataBase()
-
 
         cliente = Cliente(
             cpf=self.txt_cpf.text(),
@@ -124,7 +119,6 @@ class MainWindow (QMainWindow):
         )
         if self.btn_salvar.text() == 'Salvar':
             retorno = db.registrar_cliente(cliente)
-
 
             if retorno == 'ok':
                 msg = QMessageBox()
@@ -177,7 +171,7 @@ class MainWindow (QMainWindow):
 
     def consulta_cliente(self):
         db = DataBase()
-        retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.','').replace('-',''))
+        retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.', '').replace('-', ''))
 
         if retorno is not None:
             self.btn_salvar.setText('Atualizar')
@@ -185,7 +179,6 @@ class MainWindow (QMainWindow):
             msg.setWindowTitle('Cliente já cadastrado')
             msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
             msg.exec()
-
 
             self.txt_nome.setText(retorno[1])
             self.txt_telefone_fixo.setText(retorno[2])
@@ -258,7 +251,6 @@ class MainWindow (QMainWindow):
             msg.setText('Erro ao consultar CEP verifique os dados inseridos')
             msg.exec()
 
-
     def popula_tabela_clientes(self):
         self.tabela_clientes.setRowCount(0)
         db = DataBase()
@@ -286,3 +278,5 @@ class MainWindow (QMainWindow):
         self.btn_salvar.setText('Atualizar')
         self.txt_cpf.setReadOnly(True)
 
+
+self.txt_id.setReadOnly(True)
