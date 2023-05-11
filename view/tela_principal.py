@@ -1,15 +1,20 @@
 import requests
 import json
+
+
 from PySide6.QtWidgets import (QMainWindow, QLabel, QComboBox, QLineEdit, QPushButton, QWidget, QMessageBox,
                                QSizePolicy, QVBoxLayout, QTableWidget, QAbstractItemView, QTableWidgetItem)
 
 from infra.entities.cliente import Cliente
+from infra.repository.cliente_repository import ClienteRepository
 from infra.configs.connection import DBConnectionHandler
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        conn = DBConnectionHandler()
 
         self.setMinimumSize(500, 900)
 
@@ -95,14 +100,13 @@ class MainWindow(QMainWindow):
         self.btn_salvar.clicked.connect(self.salvar_cliente)
         self.txt_cep.editingFinished.connect(self.consulta_endereco)
         self.btn_limpar.clicked.connect(self.limpar_conteudo)
-        self.txt_cpf.editingFinished.connect(self.consulta_cliente)
+        # self.txt_cpf.editingFinished.connect(self.consulta_cliente)
         self.btn_remover.clicked.connect(self.remover_cliente)
         self.tabela_clientes.cellDoubleClicked.connect(self.carrega_dados)
         self.popula_tabela_clientes()
 
     def salvar_cliente(self):
-        db = DBConnectionHandler()
-
+        db = ClienteRepository()
         cliente = Cliente(
             cpf=self.txt_cpf.text(),
             nome=self.txt_nome.text(),
@@ -118,7 +122,7 @@ class MainWindow(QMainWindow):
             estado=self.txt_estado.text()
         )
         if self.btn_salvar.text() == 'Salvar':
-            retorno = db.registrar_cliente(cliente)
+            retorno = db.insert(cliente)
 
             if retorno == 'ok':
                 msg = QMessageBox()
@@ -143,13 +147,14 @@ class MainWindow(QMainWindow):
                 msg.exec()
         elif self.btn_salvar.text() == 'Atualizar':
 
-            retorno = db.atualizar_cliente(cliente)
+            cliente.cpf = int(self.txt_cpf.text())
+            retorno = db.update(cliente)
 
             if retorno == 'ok':
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Information)
-                msg.setWindowTitle('Cadastro atualizado')
-                msg.setText('Cadastro atualizado com sucesso')
+                msg.setWindowTitle('Dados atualizados')
+                msg.setText('Dados do cliente atualizados')
                 msg.exec()
             else:
                 msg = QMessageBox()
@@ -157,8 +162,8 @@ class MainWindow(QMainWindow):
                 msg.setWindowTitle('Erro ao atualizar')
                 msg.setText('Erro ao cadastrar, verifique os dados inseridos')
                 msg.exec()
-            self.popula_tabela_clientes()
             self.txt_cpf.setReadOnly(False)
+        self.popula_tabela_clientes()
 
     def limpar_conteudo(self):
         for widget in self.container.children():
@@ -169,33 +174,34 @@ class MainWindow(QMainWindow):
         self.btn_remover.setVisible(False)
         self.btn_salvar.setText('Salvar')
 
-    def consulta_cliente(self):
-        db = DBConnectionHandler()
-        retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.', '').replace('-', ''))
-
-        if retorno is not None:
-            self.btn_salvar.setText('Atualizar')
-            msg = QMessageBox()
-            msg.setWindowTitle('Cliente já cadastrado')
-            msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
-            msg.exec()
-
-            self.txt_nome.setText(retorno[1])
-            self.txt_telefone_fixo.setText(retorno[2])
-            self.txt_telefone_celular.setText(retorno[3])
-
-            sexo_map = {'não informado': 0, 'Masculino': 1, 'Feminino': 2}
-            self.cb_sexo.setCurrentIndex(sexo_map.get(retorno[4], 0))
-            self.txt_cep.setText(retorno[5])
-            self.txt_logradouro.setText(retorno[6])
-            self.txt_numero.setText(retorno[7])
-            self.txt_complemento.setText(retorno[8])
-            self.txt_bairro.setText(retorno[9])
-            self.txt_municipio.setText(retorno[10])
-            self.txt_estado.setText(retorno[11])
-            self.btn_remover.setVisible(True)
+    # def consulta_cliente(self):
+    #     db = DBConnectionHandler()
+    #     retorno = db.consultar_cliente(str(self.txt_cpf.text()).replace('.', '').replace('-', ''))
+    #
+    #     if retorno is not None:
+    #         self.btn_salvar.setText('Atualizar')
+    #         msg = QMessageBox()
+    #         msg.setWindowTitle('Cliente já cadastrado')
+    #         msg.setText(f'O CPF {self.txt_cpf.text()} já tem cadastro')
+    #         msg.exec()
+    #
+    #         self.txt_nome.setText(retorno[1])
+    #         self.txt_telefone_fixo.setText(retorno[2])
+    #         self.txt_telefone_celular.setText(retorno[3])
+    #
+    #         sexo_map = {'não informado': 0, 'Masculino': 1, 'Feminino': 2}
+    #         self.cb_sexo.setCurrentIndex(sexo_map.get(retorno[4], 0))
+    #         self.txt_cep.setText(retorno[5])
+    #         self.txt_logradouro.setText(retorno[6])
+    #         self.txt_numero.setText(retorno[7])
+    #         self.txt_complemento.setText(retorno[8])
+    #         self.txt_bairro.setText(retorno[9])
+    #         self.txt_municipio.setText(retorno[10])
+    #         self.txt_estado.setText(retorno[11])
+    #         self.btn_remover.setVisible(True)
 
     def remover_cliente(self):
+        db = ClienteRepository()
         msg = QMessageBox()
         msg.setWindowTitle('Remover cliente')
         msg.setText('Este cliente será removido')
@@ -207,8 +213,7 @@ class MainWindow(QMainWindow):
         resposta = msg.exec()
 
         if resposta == QMessageBox.Yes:
-            db = DBConnectionHandler()
-            retorno = db.deletar_cliente(self.txt_cpf.text())
+            retorno = db.delete(self.txt_cpf.text())
 
             if retorno == 'ok':
                 nv_msg = QMessageBox()
@@ -222,6 +227,7 @@ class MainWindow(QMainWindow):
                 nv_msg.exec()
             self.txt_cpf.setReadOnly(False)
             self.popula_tabela_clientes()
+        self.popula_tabela_clientes()
 
     def limpar_campos(self):
         for widget in self.container.children():
@@ -253,14 +259,20 @@ class MainWindow(QMainWindow):
 
     def popula_tabela_clientes(self):
         self.tabela_clientes.setRowCount(0)
-        db = DBConnectionHandler()
-        lista_clientes = db.consultar_todos_clientes()
+        conn = ClienteRepository()
+        lista_clientes = conn.select_all()
         self.tabela_clientes.setRowCount(len(lista_clientes))
 
-        for linha, cliente in enumerate(lista_clientes):
-            for coluna, valor in enumerate(cliente):
-                self.tabela_clientes.setItem(linha, coluna, QTableWidgetItem(str(valor)))
-
+        linha = 0
+        for cliente, linha in lista_clientes:
+            valores = [cliente.cpf, cliente.nome, cliente.telefone_fixo, cliente.telefone_celular,
+                       cliente.numero, cliente.sexo, cliente.cep, cliente.logradouro, cliente.complemento,
+                       cliente.bairro, cliente.municipio, cliente.estado]
+            for valor in valores:
+                item = QTableWidgetItem(str(valor))
+                self.tabela_clientes.setItem(linha, valores.index(valor), item)
+                self.tabela_clientes.item(linha, valores.index(valor))
+            linha += 1
     def carrega_dados(self, row, column):
         self.txt_cpf.setText(self.tabela_clientes.item(row, 0).text())
         self.txt_nome.setText(self.tabela_clientes.item(row, 1).text())
@@ -278,5 +290,6 @@ class MainWindow(QMainWindow):
         self.btn_salvar.setText('Atualizar')
         self.txt_cpf.setReadOnly(True)
 
-
-self.txt_id.setReadOnly(True)
+        self.btn_salvar.setText('Atualizar')
+        self.btn_remover.setVisible(True)
+        self.txt_cpf.setReadOnly(True)
