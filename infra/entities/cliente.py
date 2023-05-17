@@ -1,11 +1,12 @@
 from infra.configs.base import Base
 from sqlalchemy import Column, String, Integer
 
+
 class Cliente(Base):
-    #Nome da tabela criada
+    # Nome da tabela criada
     __tablename__ = 'cliente'
-    #Colunas da tabela que serão criadas na tabela
-    cpf = Column(Integer, autoincrement=True, primary_key=True)
+    # Colunas da tabela que serão criadas na tabela
+    cpf = Column(String(length=100), primary_key=True)
     nome = Column(String(length=100), nullable=False)
     telefone_fixo = Column(String(length=100), nullable=False)
     telefone_celular = Column(String(length=100), nullable=False)
@@ -18,6 +19,7 @@ class Cliente(Base):
     municipio = Column(String(length=100), nullable=False)
     estado = Column(String(length=100), nullable=False)
 
-#Função que sobrescreve a maneira de 'printar' o objeto
+
+# Função que sobrescreve a maneira de 'printar' o objeto
 def __repr__(self):
     return f'Nome do cliente = {self.nome}, id = {self.cpf}'

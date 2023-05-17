@@ -38,6 +38,7 @@ class DBConnectionHandler:
 #Função para criação da engine sem necessidade de informar dados de endereço do banco e utilização de queryes escritas a mão
     def __create_database_engine(self):
         engine = create_engine(self.__connection_string, echo=True)
+        return engine
 
     def get_engine(self):
         return self.__engine
